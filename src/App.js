@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import imagen from './cryptomonedas.png';
 import Formulario from './components/Formulario';
+import axios from 'axios';
+import Cotizacion from './components/Cotizacion';
+import Spinner from './components/Spinner';
 
-const Contenedor = styled.div `
+const Contenedor = styled.div`
   max-width: 900px;
   margin: 0 auto;
   @media (min-width: 992px) {
@@ -13,12 +16,12 @@ const Contenedor = styled.div `
   }
 `;
 
-const Imagen = styled.img `
+const Imagen = styled.img`
   max-width: 100%;
   margin-top: 5rem;
 `;
 
-const Heading = styled.h1 `
+const Heading = styled.h1`
   font-family: 'Bebas Neue', cursive;
   color: #FFF;
   text-align: left;
@@ -37,6 +40,33 @@ const Heading = styled.h1 `
 `;
 
 function App() {
+
+  const [moneda, setMoneda] = useState('');
+  const [criptomoneda, setCriptomoneda] = useState('');
+  const [resultado, setResultado] = useState({});
+  const [cargando, setCargando] = useState(false)
+
+
+  useEffect(() => {
+    //Consultamos la API
+    const cotizarCriptomoneda = async () => {
+      //evitamos la ejecución la primera vez
+      if (moneda === '') { return; }
+      const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda.trim().toUpperCase()}&tsyms=${moneda.trim().toUpperCase()}`;
+      const resultado = await axios.get(url);
+      setCargando(true);
+      setTimeout(() => {
+        setCargando(false);
+        setResultado(resultado.data.DISPLAY[criptomoneda] [moneda]);
+      }, 2000);
+      
+    }
+    cotizarCriptomoneda();
+  }, [moneda, criptomoneda])
+
+  //Mostar Spinner o resultado
+  const componente = (cargando) ? <Spinner></Spinner> : <Cotizacion resultado={resultado}></Cotizacion>
+  
   return (
     <Contenedor>
       <div>
@@ -48,7 +78,10 @@ function App() {
       </div>
       <div>
         <Heading>Cotiza Criptomoneda al Instante</Heading>
-        <Formulario></Formulario>
+        <Formulario
+          setMoneda={setMoneda}
+          setCriptomoneda={setCriptomoneda}></Formulario>
+        {componente}
       </div>
     </Contenedor>
   );

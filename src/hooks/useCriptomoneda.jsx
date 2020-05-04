@@ -1,5 +1,6 @@
 import React, {Fragment, useState} from 'react';
 import styled from '@emotion/styled';
+import PropTypes from 'prop-types';
 
 const Label = styled.label `
   font-family: 'Bebas Neue', cursive;
@@ -32,7 +33,7 @@ const useCriptomoneda = (label, stateInicial, opciones) => {
         value={state}>
           <option value="">-- Seleccione --</option>
           {opciones.map(opcion => (
-            <option key={opcion.CoinInfo.id} value={opcion.CoinInfo.name}>{opcion.CoinInfo.FullName}</option>
+            <option key={opcion.CoinInfo.id} value={opcion.CoinInfo.Name}>{opcion.CoinInfo.FullName}</option>
           ))}
       </Select>
     </Fragment>
@@ -40,6 +41,12 @@ const useCriptomoneda = (label, stateInicial, opciones) => {
 
   return [state, SelectCripto, setState];
 
+}
+
+useCriptomoneda.propTypes = {
+  label: PropTypes.string.isRequired, 
+  stateInicial: PropTypes.object.isRequired,
+  opciones: PropTypes.array.isRequired
 }
 
 export default useCriptomoneda;
